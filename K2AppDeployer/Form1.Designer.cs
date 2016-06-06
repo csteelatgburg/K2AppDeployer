@@ -32,6 +32,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.K2HostName = new System.Windows.Forms.TextBox();
             this.K2SAMBAPass = new System.Windows.Forms.TextBox();
+            this.mapKDrive = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -67,11 +68,22 @@
             this.K2SAMBAPass.Size = new System.Drawing.Size(405, 31);
             this.K2SAMBAPass.TabIndex = 3;
             // 
+            // mapKDrive
+            // 
+            this.mapKDrive.Location = new System.Drawing.Point(37, 140);
+            this.mapKDrive.Name = "mapKDrive";
+            this.mapKDrive.Size = new System.Drawing.Size(232, 69);
+            this.mapKDrive.TabIndex = 4;
+            this.mapKDrive.Text = "Map K: to K2000";
+            this.mapKDrive.UseVisualStyleBackColor = true;
+            this.mapKDrive.Click += new System.EventHandler(this.mapKDrive_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1456, 624);
+            this.Controls.Add(this.mapKDrive);
             this.Controls.Add(this.K2SAMBAPass);
             this.Controls.Add(this.K2HostName);
             this.Controls.Add(this.label2);
@@ -90,6 +102,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox K2HostName;
         private System.Windows.Forms.TextBox K2SAMBAPass;
+        private System.Windows.Forms.Button mapKDrive;
     }
 }
 
