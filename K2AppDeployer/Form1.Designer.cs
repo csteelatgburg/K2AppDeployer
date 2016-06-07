@@ -51,7 +51,6 @@
             this.Type = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Guid = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.generateTasksXML = new System.Windows.Forms.Button();
-            this.generateSettingsXML = new System.Windows.Forms.Button();
             this.launchKE = new System.Windows.Forms.Button();
             this.config = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
@@ -221,16 +220,6 @@
             this.generateTasksXML.Visible = false;
             this.generateTasksXML.Click += new System.EventHandler(this.generateTasksXML_Click);
             // 
-            // generateSettingsXML
-            // 
-            this.generateSettingsXML.Location = new System.Drawing.Point(553, 32);
-            this.generateSettingsXML.Name = "generateSettingsXML";
-            this.generateSettingsXML.Size = new System.Drawing.Size(203, 61);
-            this.generateSettingsXML.TabIndex = 14;
-            this.generateSettingsXML.Text = "Save Settings";
-            this.generateSettingsXML.UseVisualStyleBackColor = true;
-            this.generateSettingsXML.Click += new System.EventHandler(this.generateSettingsXML_Click);
-            // 
             // launchKE
             // 
             this.launchKE.Location = new System.Drawing.Point(32, 271);
@@ -257,7 +246,6 @@
             this.ClientSize = new System.Drawing.Size(1456, 998);
             this.Controls.Add(this.config);
             this.Controls.Add(this.launchKE);
-            this.Controls.Add(this.generateSettingsXML);
             this.Controls.Add(this.generateTasksXML);
             this.Controls.Add(this.POTasks);
             this.Controls.Add(this.POTasksLabel);
@@ -302,7 +290,6 @@
         private System.Windows.Forms.ColumnHeader FileType;
         private System.Windows.Forms.ColumnHeader Type;
         private System.Windows.Forms.ColumnHeader Guid;
-        private System.Windows.Forms.Button generateSettingsXML;
         private System.Windows.Forms.Button launchKE;
         private System.Windows.Forms.RichTextBox config;
     }

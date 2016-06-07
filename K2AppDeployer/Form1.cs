@@ -30,28 +30,19 @@ namespace K2AppDeployer
                 log("K: drive appears to be mapped to the K2000 already.");
                 getTaskFiles();
             }
-            if (File.Exists(@"settings.xml"))
+            String[] arguments = Environment.GetCommandLineArgs();
+            if(arguments.Length == 3)
             {
-                log("Loading settings from settings.xml");
-                string XMLFile = "settings.xml";
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(XMLFile);
-                XmlNode K2HostNameNode = xmlDoc.SelectSingleNode("//Settings/K2HostName");
-                K2HostName.Text = K2HostNameNode.InnerText;
-
+                log("Found command line arguments for K2 hostname and password.");
+                K2HostName.Text = arguments[1];
+                K2SAMBAPass.Text = arguments[2];
+                mapDrive();
             }
-            if(File.Exists(@"tasks.xml"))
+            if (File.Exists(@"tasks.xml"))
             {
+                log("Found tasks.xml file, loading");
                 Directory.CreateDirectory(@"c:\KACE\engine");
                 File.Copy(@"tasks.xml", @"c:\KACE\engine\tasks.xml");
-            }
-            String[] arguments = Environment.GetCommandLineArgs();
-            if(arguments.Length > 1)
-            {
-                K2SAMBAPass.Text = arguments[1];
-                if(K2HostName.Text != "") {
-                    mapDrive();
-                }
             }
 
         }
@@ -184,14 +175,23 @@ namespace K2AppDeployer
                     XmlNode WorkingDirectory = xmlDoc.CreateElement("WorkingDirectory");
                     if(Directory.Exists("K:\\applications\\" + task.SubItems[0].Text + "\\contents"))
                     {
-                        WorkingDirectory.InnerText = task.SubItems[2].Text + "\\contents";
+                        WorkingDirectory.InnerText = task.SubItems[2].Text.Replace(@"%systemdrive%\KACE", "k:") + "\\contents";
                     } else
                     {
-                        WorkingDirectory.InnerText = task.SubItems[2].Text;
+                        WorkingDirectory.InnerText = task.SubItems[2].Text.Replace(@"%systemdrive%\KACE", "k:");
                     }
                     taskNode.AppendChild(WorkingDirectory);
                     XmlNode CommandLine = xmlDoc.CreateElement("CommandLine");
-                    CommandLine.InnerXml = task.SubItems[3].Text;
+                    if (Directory.Exists("K:\\applications\\" + task.SubItems[0].Text + "\\contents"))
+                    {
+                        string command = @"Applications\" + task.SubItems[0].Text;
+
+                        CommandLine.InnerXml = task.SubItems[3].Text.Replace(@"%systemdrive%\KACE", "k:").Replace(command, command + "\\contents");
+                    }
+                    else
+                    {
+                        CommandLine.InnerXml = task.SubItems[3].Text.Replace(@"%systemdrive%\KACE", "k:");
+                    }
                     taskNode.AppendChild(CommandLine);
                     XmlNode Parameters = xmlDoc.CreateElement("Parameters");
                     Parameters.InnerText = task.SubItems[4].Text;
@@ -214,22 +214,13 @@ namespace K2AppDeployer
                     rootNode.AppendChild(taskNode);
                 }
             }
-            xmlDoc.Save(@"c:\KACE\engine\tasks.xml");
+            xmlDoc.Save(@"tasks.xml");
             log("Saved tasks.xml file");
 
-            //System.Diagnostics.Process.Start("notepad.exe", @"c:\temp\tasks.xml");
+            //System.Diagnostics.Process.Start("notepad.exe", @"tasks.xml");
         }
 
-        private void generateSettingsXML_Click(object sender, EventArgs e)
-        {
-            XmlDocument settings = new XmlDocument();
-            XmlNode rootNode = settings.CreateElement("Settings");
-            settings.AppendChild(rootNode);
-            XmlNode K2HostNameNode = settings.CreateElement("K2HostName");
-            K2HostNameNode.InnerText = K2HostName.Text;
-            rootNode.AppendChild(K2HostNameNode);
-            settings.Save("settings.xml");
-        }
+        
 
         private void launchKE_Click(object sender, EventArgs e)
         {
