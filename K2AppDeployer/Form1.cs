@@ -25,10 +25,17 @@ namespace K2AppDeployer
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            bool DriveMapped = false;
+            bool tasksLoaded = false;
+            bool commandLine = false;
             if(Directory.Exists(@"K:\scripts"))
             {
                 log("K: drive appears to be mapped to the K2000 already.");
                 getTaskFiles();
+                DriveMapped = true;
+                mapKDrive.Enabled = false;
+                Step1.Text = Step1.Text + " - Done";
+
             }
             String[] arguments = Environment.GetCommandLineArgs();
             if(arguments.Length == 3)
@@ -37,13 +44,24 @@ namespace K2AppDeployer
                 K2HostName.Text = arguments[1];
                 K2SAMBAPass.Text = arguments[2];
                 mapDrive();
+                DriveMapped = true;
+                commandLine = true;
+                
             }
             if (File.Exists(@"tasks.xml"))
             {
                 log("Found tasks.xml file, loading");
                 Directory.CreateDirectory(@"c:\KACE\engine");
-                File.Copy(@"tasks.xml", @"c:\KACE\engine\tasks.xml");
+                File.Copy(@"tasks.xml", @"c:\KACE\engine\tasks.xml", true);
+                loadTasksXML("tasks.xml");
+                tasksLoaded = true;
+                launchKE.Enabled = true;
             }
+            if(DriveMapped & tasksLoaded & commandLine)
+            {
+                launchKE.PerformClick();
+            }
+            
 
         }
 
@@ -78,7 +96,9 @@ namespace K2AppDeployer
 
         private void mapKDrive_Click(object sender, EventArgs e)
         {
+          
             mapDrive();
+            Step1.Text = Step1.Text + " - Done";
         }
 
         public void getTaskFiles()
@@ -93,10 +113,8 @@ namespace K2AppDeployer
                 }
 
 }
-
-        private void tasksList_SelectedIndexChanged(object sender, EventArgs e)
+        public void loadTasksXML(string taskXMLFile)
         {
-            POTasks.Items.Clear();
             var unCheckedTasks = new List<string>();
             unCheckedTasks.Add("Set KACE Path");
             unCheckedTasks.Add("Fix BCD");
@@ -107,11 +125,12 @@ namespace K2AppDeployer
             unCheckedTasks.Add("Capture and Disable UAC");
             unCheckedTasks.Add("Run DPInst");
             unCheckedTasks.Add("Restore UAC");
+            unCheckedTasks.Add("Set Engine Run Key");
+
+            log("Loading  " + taskXMLFile);
             
-            log("Selected " + tasksList.SelectedItem);
-            string XMLFile = tasksList.SelectedItem.ToString();
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(XMLFile);
+            xmlDoc.Load(taskXMLFile);
             XmlNodeList itemNodes = xmlDoc.SelectNodes("//Tasks/Task");
             foreach (XmlNode itemNode in itemNodes)
             {
@@ -144,15 +163,24 @@ namespace K2AppDeployer
                     if (unCheckedTasks.Contains(name.InnerText))
                     {
                         POTasks.Items.Add(itm);
-                    } else
+                    }
+                    else
                     {
                         itm.Checked = true;
                         POTasks.Items.Add(itm);
                     }
-                    
+
                 }
             }
-            generateTasksXML.Visible = true;
+
+        }
+
+        private void tasksList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            POTasks.Items.Clear();
+            
+            loadTasksXML(tasksList.SelectedItem.ToString());
+            generateTasksXML.Enabled = true;
 
         }
 
@@ -160,15 +188,13 @@ namespace K2AppDeployer
         {
             Directory.CreateDirectory(@"c:\KACE\engine");
             XmlDocument xmlDoc = new XmlDocument();
-            XmlNode rootNode = xmlDoc.CreateElement("Tasks");
-            xmlDoc.AppendChild(rootNode);
+            XmlElement rootNode = xmlDoc.CreateElement("Tasks");
             foreach (ListViewItem task in POTasks.Items)
             {
                 if(task.Checked)
                 {
-                    XmlNode taskNode = xmlDoc.CreateElement("Task");
-                    XmlAttribute attribute = xmlDoc.CreateAttribute("ID");
-                    attribute.Value = task.SubItems[0].Text;
+                    XmlElement taskNode = xmlDoc.CreateElement("Task");
+                    taskNode.SetAttribute("ID", task.SubItems[0].Text);
                     XmlNode name = xmlDoc.CreateElement("Name");
                     name.InnerText = task.SubItems[1].Text;
                     taskNode.AppendChild(name);
@@ -214,9 +240,11 @@ namespace K2AppDeployer
                     rootNode.AppendChild(taskNode);
                 }
             }
+            xmlDoc.AppendChild(rootNode);
+
             xmlDoc.Save(@"tasks.xml");
             log("Saved tasks.xml file");
-
+            launchKE.Enabled = true;
             //System.Diagnostics.Process.Start("notepad.exe", @"tasks.xml");
         }
 
@@ -253,6 +281,11 @@ namespace K2AppDeployer
         private void config_TextChanged(object sender, EventArgs e)
         {
             
+        }
+
+        private void K2HostName_TextChanged(object sender, EventArgs e)
+        {
+            mapKDrive.Enabled = true;
         }
     }
 }
@@ -412,7 +445,7 @@ public class DirectoryCopyClass
         foreach (FileInfo file in files)
         {
             string temppath = Path.Combine(destDirName, file.Name);
-            file.CopyTo(temppath, false);
+            file.CopyTo(temppath, true);
         }
 
         // If copying subdirectories, copy them and their contents to new location.

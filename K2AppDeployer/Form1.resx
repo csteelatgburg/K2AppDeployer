@@ -120,7 +120,7 @@
   <data name="config.Text" xml:space="preserve">
     <value>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;Config DeploymentId="47"&gt;
-  &lt;ContinueOnError&gt;false&lt;/ContinueOnError&gt;
+  &lt;ContinueOnError&gt;true&lt;/ContinueOnError&gt;
   &lt;UIPath&gt;C:\KACE\engine\KACEEngineUI\hta\Main.hta&lt;/UIPath&gt;
   &lt;HostServer&gt;172.16.152.105&lt;/HostServer&gt;
   &lt;DeploymentType&gt;SI&lt;/DeploymentType&gt;
